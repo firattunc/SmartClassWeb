@@ -1,0 +1,344 @@
+﻿@using SmartClass.Web.ViewModels
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html class="no-js" lang="">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Akıllı Sınıf | Testler </title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">   
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+    <!-- FOR DEMO PURPOSES ONLY. You should remove this in your project -->
+    <link href="~/Content/AdminContent/css/demo.css" rel="stylesheet" />
+    <!-- GOOGLE FONTS -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700" rel="stylesheet">
+    <!-- ICONS -->
+    <link rel="icon" type="image/png" sizes="96x96" href="~/Content/AdminContent/img/favicon.png">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <!-- Normalize CSS -->
+    <link href="~/Content/css/normalize.css" rel="stylesheet" />
+    <!-- Main CSS -->
+    <link href="~/Content/css/main.css" rel="stylesheet" />
+    <!-- Bootstrap CSS -->
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <!-- Animate CSS -->
+    <link href="~/Content/css/animate.min.css" rel="stylesheet" />
+    <!-- Font-awesome CSS-->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+    <!-- Owl Caousel CSS -->
+    <link href="~/Scripts/vendor/OwlCarousel/owl.carousel.min.css" rel="stylesheet" />
+    <link href="~/Scripts/vendor/OwlCarousel/owl.theme.default.min.css" rel="stylesheet" />
+    <!-- Main Menu CSS -->
+    <link href="~/Content/css/meanmenu.min.css" rel="stylesheet" />
+    <!-- Datetime Picker Style CSS -->
+    <link href="~/Content/css/jquery.datetimepicker.css" rel="stylesheet" />
+    <!-- ReImageGrid CSS -->
+    <link href="~/Content/css/reImageGrid.css" rel="stylesheet" />
+    <!-- Switch Style CSS -->
+    <link href="~/Content/css/hover-min.css" rel="stylesheet" />
+    <!-- Custom CSS -->
+    <link href="~/Content/css/style.css" type="text/css" rel="stylesheet" />
+    <!-- Modernizr Js -->
+    <script src="~/Scripts/modernizr-2.8.3.min.js"></script>
+    <style>
+        .cart-page-area {
+            padding: 0px;
+        }
+
+        .field-validation-error {
+            border: 2px dotted;
+            background-color: red;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        #progressbar {
+            background-color: black;
+            border-radius: 13px;
+            /* (height of inner div) / 2 + padding */
+            padding: 1px;
+        }
+
+            #progressbar > div {
+                background-color: orange;
+                width: 0%;
+                /* Adjust with JavaScript */
+                height: 10px;
+                border-radius: 10px;
+            }
+
+        .yuvarlak {
+            border: 1px solid green;
+            background-color: yellow;
+            width: 100px;
+            height: 100px;
+            border-radius: 50px;
+            -moz-border-radius: 50px;
+            -webkit-border-radius: 50px;
+        }
+
+        .cevapButton {
+            background-color: orange;
+            width: 130px;
+            color: white;
+            height: 51px;
+        }
+
+        .hmdxoi {
+            color: rgb(255, 255, 255);
+            background-color: rgb(58, 160, 58);
+            font-size: 11px;
+            line-height: 16px;
+            font-weight: 600;
+            text-align: center;
+            width: 300px;
+            height: 16px;
+            display: inline-block;
+            text-decoration: none;
+            padding: 0px 7px;
+            border-radius: 2px;
+        }
+
+        .validation-summary-success {
+            border: 2px dotted;
+            background-color: lawngreen;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .validation-summary-success {
+            border: 2px dotted;
+            background-color: lawngreen;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .validation-summary-errors {
+            border: 2px dotted;
+            background-color: red;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+            .validation-summary-errors li {
+                color: #fff;
+                list-style-type: none;
+                padding: 5px;
+            }
+
+        .user-account-info ul li:before {
+            display: none;
+        }
+
+        .main-banner2-area {
+            background-image: url("/Content/img/main-banner2.jpg");
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+    </style>
+</head>
+<body>
+    
+    <!-- Main Body Area Start Here -->
+    <div id="wrapper">
+        <!-- Header Area Start Here -->
+        <header>
+            <div id="header2" class="header2-area">
+                <div class="header-top-bar">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-lg-2 col-md-2 col-sm-2 hidden-xs">
+                                <div class="logo-area" style="margin:0px;">
+                                    <a href="/Home/Index"><img class="img-responsive" src="~/Content/img/logo.png" alt="logo"></a>
+                                </div>
+                            </div>
+                            <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+                                <ul class="profile-notification">
+                                    @Html.Partial("/Views/PartialViews/_PartialPageIsLogin.cshtml")
+
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="main-menu-area bg-primaryText" id="sticker">
+                    <div class="container">
+                        <nav id="desktop-nav">
+                            @Html.Partial("/Views/PartialViews/_PartialPageMenu.cshtml")
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            <!-- Mobile Menu Area Start -->
+            <div class="mobile-menu-area">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mobile-menu">
+                                <nav id="dropdown">
+                                    <ul>
+                                        @Html.Partial("/Views/PartialViews/_PartialPageMenu.cshtml")
+                                    </ul>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Mobile Menu Area End -->
+        </header>
+        <!-- Header Area End Here -->
+        <!-- Inner Page Banner Area Start Here -->
+        @RenderBody()
+
+        <footer>
+            <div class="footer-area-top">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                            <div class="footer-box">
+                                <h3 class="title-bar-left title-bar-footer">Adresimiz</h3>
+                                <ul class="corporate-address">
+                                    <li><i class="fa fa-map-marker" aria-hidden="true"></i><p href="Phone(01)800433633">Acarlar Mah. Şehit, Ali Karakuzu Sk. No:10, 45400 Turgutlu/Manisa</p></li>
+                                    <li><i class="fa fa-phone" aria-hidden="true"></i>+61 3 8376 6284</li>
+                                    <li><i class="fa fa-fax" aria-hidden="true"></i>+61 3 8376 6284</li>
+                                    <li><i class="fa fa-envelope-o" aria-hidden="true"></i>info@foxtar.com</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                            <div class="footer-box">
+                                <h3 class="title-bar-left title-bar-footer">Yardım</h3>
+                                <ul class="featured-links">
+                                    <li>
+                                        <ul>
+                                            <li><a href="#">Anasayfa</a></li>
+                                            <li><a href="#">Hakkımızda</a></li>
+                                            <li><a href="#">İletisim</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+                            <div class="footer-box">
+                                <h3 class="title-bar-left title-bar-footer">Bizi Takip Edin</h3>
+                                <ul class="footer-social">
+                                    <li><a href="#"><i class="fa fa-facebook" aria-hidden="true"></i></a></li>
+                                    <li><a href="#"><i class="fa fa-twitter" aria-hidden="true"></i></a></li>
+                                    <li><a href="#"><i class="fa fa-youtube-play" aria-hidden="true"></i></a></li>
+                                    <li><a href="#"><i class="fa fa-pinterest" aria-hidden="true"></i></a></li>
+                                    <li><a href="#"><i class="fa fa-linkedin" aria-hidden="true"></i></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-area-bottom">
+                <div class="container">
+                    <p> 2019 Akıllı Sınıf Web uygulaması.ASP.NET MVC ile yapılmıştır.</p>
+                </div>
+            </div>
+        </footer>
+        <!-- Footer Area End Here -->
+    </div>
+    <!-- Main Body Area End Here -->
+    <!-- Main Body Area End Here -->
+    <!-- jquery-->
+    <script src="~/Scripts/jquery-2.2.4.min.js"></script>
+    <!-- Plugins js -->
+    <script src="~/Scripts/plugins.js"></script>
+    <!-- Bootstrap js -->
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <!-- WOW JS -->
+    <script src="~/Scripts/wow.min.js"></script>
+    <!-- Owl Cauosel JS -->
+    <script src="~/Scripts/vendor/OwlCarousel/owl.carousel.min.js"></script>
+    <!-- Meanmenu Js -->
+    <script src="~/Scripts/jquery.meanmenu.min.js"></script>
+    <!-- Srollup js -->
+    <script src="~/Scripts/jquery.scrollUp.min.js"></script>
+    <!-- jquery.counterup js -->
+    <script src="~/Scripts/jquery.counterup.min.js"></script>
+    <script src="~/Scripts/waypoints.min.js"></script>
+    <!-- Isotope js -->
+    <script src="~/Scripts/isotope.pkgd.min.js"></script>
+    <!-- Gridrotator js -->
+    <script src="~/Scripts/jquery.gridrotator.js"></script>
+    <!-- Custom Js -->
+    <script src="~/Scripts/main.js"></script>
+
+    <script src="~/node_modules/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/node_modules/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/Scripts/Utility.js"></script>
+    <link href="~/Content/Toastr/toastr.css" rel="stylesheet" />
+    <script src="~/Content/Toastr/toastr.js"></script>
+
+    @RenderSection("Script", false)
+</body>
+</html>
+<script>
+    var lock = false;
+    function Login() {
+        if (!lock) {
+            lock = true;
+            LoginControl();
+        }
+
+    }
+    function LoginControl() {
+        var model = { kullaniciAdi: $("#loginKullaniciAdi").val(), sifre: $("#loginSifre").val() };
+        if (model.kullaniciAdi.trim() != "" && model.sifre.trim()) {
+            $.ajax({
+                url: "http://192.168.1.42:5555/api/auth/login",
+                type: "POST",
+                data: JSON.stringify(model),
+                contentType: "application/json",
+                dataType: "JSON",
+                success: function (e) {
+                    $.ajax({
+                        url: "/home/loginol",
+                        type: "post",
+                        data: JSON.stringify(e),
+                        contentType: "application/json",
+                        dataType: "json",
+                        success: function (result) {
+                            ShowMessage("success", "Giriş Başarılı", "Başarıyla giriş yaptınız.");
+                            setTimeout(function myfunction() {
+                                location.reload();
+                            }, 1500);
+
+                        }
+
+                    })
+                },
+                error: function (jqXHR, error, errorThrown) {
+                    lock = false;
+                    if (jqXHR.status && jqXHR.status == 400)
+                        ShowMessage("info", "", jqXHR.responseText);
+                    else
+                        ShowMessage("error", "", "Beklenmeyen giriş hatası lütfen site yöneticisiyle iletişime geçin.");
+                }
+            });
+        } else {
+            lock = false;
+            ShowMessage("warning", "Boş Geçilemez", "Lütfen Kullanıcı Adı ve Şifre giriniz.");
+        }
+
+
+    }
+    function LogOut() {
+        $.ajax({
+            url: "/home/logout",
+            type: "post",
+            success: function (result) {
+            }
+
+        });
+    }
+</script>

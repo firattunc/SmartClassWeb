@@ -1,0 +1,120 @@
+﻿@using SmartClass.Web.Models
+@{
+    Layout = "~/Views/Layout/smartClassLayout.cshtml";
+}
+@{
+    int loginUserId = 0;
+
+    if ((Session["loginUser"] as UserModel) != null)
+    {
+        loginUserId = (Session["loginUser"] as UserModel).Id;
+    }
+
+}
+@section Script{
+    <script>
+    $(function () {
+        var testCount = 0;
+        // create initial empty chart
+        var ctx_live = document.getElementById("mycanvas");
+        var myChart = new Chart(ctx_live, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    data: [],
+                    borderWidth: 1,
+                    borderColor: '#00c0ef',
+                    label: 'liveCount',
+                }]
+            },
+            options: {
+                responsive: true,
+                title: {
+                    display: true,
+                    text: "Çözdüğün testlere göre oluşturulan konu bazlı başarı yüzdesi grafiği",
+                },
+                legend: {
+                    display: false
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                        }
+                    }]
+                }
+            }
+        });
+
+
+        // logic to get new data
+        var getData = function () {
+
+             $.ajax({
+                type: "GET",
+                url: "http://192.168.1.42:5555/api/test/getgenelistatistikbykullaniciId?kullaniciId="+@loginUserId,
+                dataType: "JSON",
+                async:false,
+                success: function (val) {
+                    for (var i = 0; i < val.length; i++) {
+                        myChart.data.labels.push(val[i].altBaslikAdi);
+                        myChart.data.datasets[0].data.push(val[i].basariYuzdesi*100);
+                    }
+                    myChart.update();
+                 },
+                error: function (jqXHR, error, errorThrown) {                    
+                    if (jqXHR.status && jqXHR.status == 400)
+                        ShowMessage("info", "", jqXHR.responseText);
+                    else
+                        ShowMessage("error", "Hata", "Beklenmeyen hata lütfen site yöneticisiyle iletişime geçin.");
+                }
+            })
+        }
+        var clear = function () {
+            for (var i = 0; i < 30; i++) {
+                myChart.data.labels.pop();
+                myChart.data.datasets[0].data.pop();
+            }
+        }
+
+        clear();
+        getData();
+
+
+
+
+
+    });
+    </script>
+}
+
+<!-- Header Area End Here -->
+<!-- Inner Page Banner Area Start Here -->
+<div class="pagination-area bg-secondary">
+    <div class="container">
+        <div class="pagination-wrapper">
+            <ul>
+                <li><a href="/Home/Profile">Profile</a><span> -</span></li>
+                <li>Başarı Grafiği</li>
+            </ul>
+        </div>
+    </div>
+</div>
+<!-- Inner Page Banner Area End Here -->
+<!-- Registration Page Area Start Here -->
+<div class="registration-page-area bg-secondary section-space-bottom">
+    <div class="container">
+        <h2 class="title-section">Başarı Grafiği</h2>
+        <div class="registration-details-area inner-page-padding">
+            <form id="personal-info-form">
+                <div class="row panel-body">
+                    <canvas id="mycanvas" width="300" height="200"></canvas>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Registration Page Area End Here -->
+<!-- Footer Area Start Here -->

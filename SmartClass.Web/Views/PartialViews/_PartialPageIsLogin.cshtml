@@ -1,0 +1,97 @@
+﻿@using SmartClass.Web.Models
+@{
+    UserModel loginUser = null;
+    if (Session["loginUser"] != null)
+    {
+        loginUser = Session["loginUser"] as UserModel;
+    }
+}
+
+@if (loginUser != null)
+{
+    <li>
+
+        <div class="user-account-info">
+            <div class="user-account-info-controler">
+                <div class="user-account-img">
+                    <p>@loginUser.ad @loginUser.soyad</p>
+                </div>
+
+                <div class="user-account-dropdown">
+                    <i class="glyphicon glyphicon-arrow-down" aria-hidden="true"></i>
+                </div>
+
+
+            </div>
+            <ul>
+
+                @if (loginUser.CurrentRoleId == 1)
+                {
+                    <li>
+                        @Html.ActionLink("Test", "TestStart", "Ogrenci")
+                    </li>
+                    <li>
+                        @Html.ActionLink("Genel Başarı Grafiği", "Grafikler", "Ogrenci")
+                    </li>
+                    <li>
+                        @Html.ActionLink("Girdiğim Testler", "Testler", "Ogrenci")
+                    </li>
+                    <li>
+                        @Html.ActionLink("Puan Grafiği", "PuanGrafik", "Ogrenci")
+                    </li>
+                }
+
+                @if (loginUser.CurrentRoleId == 2)
+                {
+                    <li>
+                        @Html.ActionLink("İstatistikler", "Grafik", "Ogretmen")
+                    </li>
+                    <li>
+                        @Html.ActionLink("Ogrencileri Listele/Düzenle", "Listele", "Ogretmen")
+                    </li>
+                    <li>
+                        @Html.ActionLink("Ogrenci Ekle", "OgrenciEkle", "Ogretmen")
+                    </li>
+                }
+                @if (loginUser.CurrentRoleId == 4)
+                {
+                    <li>
+                        @Html.ActionLink("Soruları Listele", "Sorular", "SoruGorevlisi")
+                    </li>
+                    <li>
+                        @Html.ActionLink("Soru Ekle", "SoruEkle", "SoruGorevlisi")
+                    </li>
+                }
+                @if (loginUser.CurrentRoleId == 3)
+                {
+                    <li>
+                        @Html.ActionLink("Öğrenci Başarı Grafikleri", "Grafik", "Veli")
+                    </li>
+                }
+                @if (loginUser.CurrentRoleId == 5)
+                {
+                    <li>
+                        @Html.ActionLink("Kullanıcı Ekle", "KullaniciEkle", "Admin")
+                    </li>
+                }
+            </ul>
+        </div>
+    </li>
+    <li><a class="apply-now-btn-color hidden-on-mobile" onclick="LogOut()" href="">Çıkış Yap</a></li>
+}
+else
+{
+    <li>
+        <div class="apply-btn-area">
+            <a class="apply-now-btn" href="#" id="login-button">Giriş Yap</a>
+            <div class="login-form" id="login-form" style="display:@TempData["loginValid"];">
+                <h2>Login</h2>                
+                    <input class="form-control" placeholder="Kullanıcı Adınız" type="text" id="loginKullaniciAdi"/>
+                    <input class="form-control" placeholder="Şifreniz" type="password" id="loginSifre"/>                    
+                    <button class="btn-login" type="button" onclick="Login()" value="Login">Giris Yap</button>                                  
+                <button class="cross-btn form-cancel" type="submit" value=""><i class="fa fa-times" aria-hidden="true"></i></button>
+            </div>
+        </div>
+    </li>
+    <li><a class="apply-now-btn-color hidden-on-mobile" href="/Home/Register">Kayıt Ol</a></li>
+}

@@ -1,0 +1,69 @@
+﻿@using SmartClass.Web.Models;
+@{
+
+    ViewBag.Title = "TestStart";
+    Layout = "~/Views/Layout/smartClassLayout.cshtml";
+
+}
+@{
+    int loginUserId = 0;
+
+    if ((Session["loginUser"] as UserModel)!=null)
+    {
+        loginUserId= (Session["loginUser"] as UserModel).Id;
+    }
+}
+<div class="pagination-area bg-secondary">
+    <div class="container">
+        <div class="pagination-wrapper">
+        </div>
+    </div>
+</div>
+<div class="registration-page-area bg-secondary section-space-bottom">
+    <div class="container">
+        <h2>Yeni Teste Başla</h2>
+
+        <a class="apply-now-btn" id="login-button">Başla</a>
+    </div>
+</div>
+@section Script{
+    <script>
+        var lock = false;
+        $(".apply-now-btn").click(function () {
+            if (!lock) {
+                lock = true;
+                TesteBasla();
+            }   
+            
+        });
+        function TesteBasla() {
+             ShowMessage("info", "Test Bilgisi", "Testiniz oluşturuluyor lütfen bekleyiniz.");
+            $.ajax({
+                method: "POST",
+                url: "http://192.168.1.42:5555/api/test/testebasla?kullaniciId="+@loginUserId,
+                dataType: "JSON",
+                success: function (e) {
+                   
+                    $.ajax({
+                        url: "/ogrenci/testebasla",
+                        type: "post",
+                        data: JSON.stringify(e),
+                        contentType: "application/json",
+                        dataType: "json",
+                        success: function (result) {
+                            if (true) {
+                                ShowMessage("success", "Test Bilgisi", "Testiniz başarıyla oluşturuldu yönlendiriliyorsunuz.");
+                                 setTimeout(function myfunction() {
+                                     window.location = "/ogrenci/test";
+                                }, 1500);                               
+                            }                                
+                            else
+                                ShowMessage("error", "Test Hatası", "Testiniz Oluşturulurken hatayla karşılaşıldı.Lütfen site yöneticisiyle iletişime geçin.");
+                        }
+
+                    })
+                }
+            })
+        }
+    </script>
+}

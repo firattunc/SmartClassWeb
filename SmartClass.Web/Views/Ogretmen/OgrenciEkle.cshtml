@@ -1,0 +1,82 @@
+﻿@using SmartClass.Web.Models
+@{
+    ViewBag.Title = "OgrenciEkle";
+    Layout = "~/Views/Layout/smartClassLayout.cshtml";
+
+}
+@{
+    int loginUserId = 0;
+
+    if ((Session["loginUser"] as UserModel) != null)
+    {
+        loginUserId = (Session["loginUser"] as UserModel).Id;
+    }
+}
+@section Script{
+    <script>
+        $("#btnEkle").click(function () {
+            var model = {ogrenciNo:$("#txtOgrenciNo").val(),kullaniciId:@loginUserId};
+            if (model.ogrenciNo.trim() != "" ) {                
+                $.ajax({
+                    url: "http://192.168.1.42:5555/api/ogretmen/ogrenciEkle",
+                    type: "POST",
+                    data: JSON.stringify(model),
+                    contentType: "application/json",
+                    success: function (data) {
+                        ShowMessage("success", "", data);
+                    },
+                    error: function (jqXHR, error, errorThrown) {
+                        if (jqXHR.status && jqXHR.status == 400)
+                            ShowMessage("error", "", jqXHR.responseText);
+                        else
+                            ShowMessage("error", "", "Beklenmeyen test hatası lütfen site yöneticisiyle iletişime geçin.");
+                    }
+                })
+            }
+            else
+                 ShowMessage("error", "", "Lütfen bir öğrenci no girin.");
+        });
+    </script>
+}
+<div class="pagination-area bg-secondary">
+    <div class="container">
+        <div class="pagination-wrapper">
+        </div>
+    </div>
+</div>
+<!-- Inner Page Banner Area End Here -->
+<!-- Registration Page Area Start Here -->
+<div class="registration-page-area bg-secondary section-space-bottom">
+    <div class="container">
+        @if (TempData["isSuccess"] != null)
+        {
+            <div class="alert-success">
+                @TempData["isSuccess"]
+            </div>
+        }
+        <h2 class="title-section">Öğrenci Ekle</h2>
+        <div class="registration-details-area inner-page-padding">
+                <div class="row">
+                   
+                    @if (ViewBag.isSuccess == true)
+                    {
+                        <p class="validation-summary-success">BAŞARILI</p>
+                    }
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            <label class="control-label" for="first-name">Öğrenci Okul No *</label>
+                            <input type="number" id="txtOgrenciNo" required=""/>
+
+                            <button id="btnEkle" type="button" style="width:45px;height:45px;">
+                                <span class="fa fa-plus"></span>
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            
+        </div>
+    </div>
+</div>

@@ -1,0 +1,25 @@
+﻿
+@{
+    ViewBag.Title = "AccessDenied";
+    Layout = "~/Views/Layout/smartClassLayout.cshtml";
+}
+<div class="pagination-area bg-secondary">
+    <div class="container">
+        <div class="pagination-wrapper">
+        </div>
+    </div>
+</div>
+<!-- Inner Page Banner Area End Here -->
+<!-- Registration Page Area Start Here -->
+<div class="registration-page-area bg-secondary section-space-bottom">
+    <div class="container">
+        <p>
+            Bu sayfaya erişim izniniz yoktur.
+            <br /> <br />
+        </p>
+
+
+        @Html.ActionLink("Ana Sayfaya Git!", "Index", "Home", null, new { @class = "btn btn-primary" })
+
+    </div>
+</div>

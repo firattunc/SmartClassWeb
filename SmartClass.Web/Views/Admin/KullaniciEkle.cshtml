@@ -1,0 +1,188 @@
+﻿@using SmartClass.Web.ViewModels
+@model AdminKullaniciEkleModel
+@{
+    ViewBag.Title = "OgretmenEkle";
+    Layout = "~/Views/Layout/smartClassLayout.cshtml";
+
+}@section Script{
+    <script>
+        $(function myfunction() {
+            var ddlIl = $("#selectedIlId");
+            $("#selectedIllId option").not(":first").remove();
+            $.ajax({
+                method: "GET",
+                url: 'http://192.168.1.42:5555/api/auth/getiller',
+            }).done(function (result) {
+
+                var ddlIl = $("#selectedIlId");
+                for (var i = 0; i < result.length; i++) {                    
+
+                    var ilAd = result[i].ilAd;
+                    var ilId = result[i].id;
+
+                    var opt = $("<option></option>");
+                    opt.text(ilAd);
+                    opt.attr("value", ilId);
+                    ddlIl.append(opt);
+                }
+            })
+            var ddlRole = $("#selectedRoleId");
+            $("#selectedRoleId option").not(":first").remove();
+            $.ajax({
+                method: "GET",
+                url: 'http://192.168.1.42:5555/api/auth/getroller',
+            }).done(function (result) {
+
+                var ddlRole = $("#selectedRoleId");
+                for (var i = 0; i < result.length; i++) {                    
+
+                    var RoleAd = result[i].roleAdi;
+                    var RoleId = result[i].id;
+
+                    var opt = $("<option></option>");
+                    opt.text(RoleAd);
+                    opt.attr("value", RoleId);
+                    ddlRole.append(opt);
+                }
+            })
+
+        });
+        function Register() {
+            var model = {
+                ad: $("#ad").val(), soyad: $("#soyad").val(), kullaniciAdi: $("#kullaniciAdi").val(), sifre: $("#sifre").val()
+                , selectedIlId: $("#selectedIlId").val(), CurrentRoleId: $("#selectedRoleId").val(), selectedIlceId: $("#selectedIlceId").val()
+            };
+            if (model.kullaniciAdi.trim() != "" && model.sifre.trim() != ""
+                && model.ad.trim() != "" && model.soyad.trim() != "" && 
+                model.selectedIlId.trim() != "" &&
+                model.CurrentRoleId.trim() != "" &&
+                model.selectedIlceId.trim() != ""
+            ) {
+                $.ajax({
+                    url: "http://192.168.1.42:5555/api/auth/addkullanici",
+                    type: "POST",
+                    data: JSON.stringify(model),
+                    contentType: "application/json",
+                    dataType: "text",
+                    success: function (result) {
+                        ShowMessage("success", "Kayıt Başarılı", result);
+                    },
+                    error: function (jqXHR, error, errorThrown) {
+                        if (jqXHR.status && jqXHR.status == 400)                             
+                            ShowMessage("error", "Kayıt Hatası", jqXHR.responseText);   
+                        else
+                            ShowMessage("error", "Kayıt Hatası", "Beklenmeyen kayıt hatası lütfen site yöneticisiyle iletişime geçin.");
+                    }
+                });
+            } else {
+                ShowMessage("warning", "Boş Geçilemez", "Lütfen tüm alanları doldurun.");
+            }
+        }
+
+        $("#selectedIlId").change(function () {
+            var ddlIl = $(this);
+            var IlId = ddlIl.val();
+            if (IlId != "" | IlId != "-1") {
+                $("#selectedIlceId option").not(":first").remove();
+                $.ajax({
+                    method: "GET",
+                    url: 'http://192.168.1.42:5555/api/auth/getilcelerbyil?id=' + IlId
+                }).done(function (result) {
+                    var ddlIlce = $("#selectedIlceId");
+                    for (var i = 0; i < result.length; i++) {
+                        var ilceAd = result[i].ilceAd;
+                        var ilceId = result[i].id;
+
+                        var opt = $("<option></option>");
+                        opt.text(ilceAd);
+                        opt.attr("value", ilceId);
+                        ddlIlce.append(opt);
+                    }
+                })
+            }
+            else {
+                $("#selectedIlceId option").not(":first").remove();
+            }
+        });
+
+
+    </script>
+}
+
+<div class="pagination-area bg-secondary">
+    <div class="container">
+        <div class="pagination-wrapper">
+        </div>
+    </div>
+</div>
+<div class="registration-page-area bg-secondary section-space-bottom">
+    <div class="container">
+        <h2 class="title-section">Kullanıcı Ekle</h2>
+        <div class="registration-details-area inner-page-padding">
+            <form id="personal-info-form">
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            <label class="control-label" for="first-name">Adınız *</label>
+                            @Html.TextBoxFor(x => x.ad, new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            <label class="control-label" for="last-name">Soyadınız *</label>
+                            @Html.TextBoxFor(x => x.soyad, new { @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            <label class="control-label" for="email">Kullanıcı adınız *</label>
+                            @Html.TextBoxFor(x => x.kullaniciAdi, new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            <label class="control-label" for="phone">Sifreniz *</label>
+                            @Html.TextBoxFor(x => x.sifre, new { @class = "form-control", @type = "password" })
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                        <div class="form-group">
+                            <label class="control-label" for="district">İl *</label>
+                            <div class="custom-select">
+                                @Html.DropDownListFor(x => x.selectedIlId, Model.ilData, "Lütfen seçiniz", new { @class = "form-control dropdown" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                        <div class="form-group">
+                            <label class="control-label" for="district">İlce *</label>
+                            @Html.DropDownListFor(x => x.selectedIlceId, Model.ilceData, "Lütfen seçiniz", new { @class = "form-control dropdown" })
+                        </div>
+
+
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="form-group">
+                            <label class="control-label" for="district">Role *</label>
+                            @Html.DropDownListFor(x => x.selectedRoleId, Model.roleData, "Lütfen seçiniz", new { @class = "form-control dropdown" })
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="pLace-order">
+                                <button class="update-btn disabled" type="button" onclick="Register()" value="Login">Onayla</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>

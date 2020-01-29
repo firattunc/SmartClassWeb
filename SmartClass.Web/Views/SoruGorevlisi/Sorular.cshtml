@@ -1,0 +1,82 @@
+﻿@using SmartClass.Web.Models
+@model List<Soru>
+@{
+    ViewBag.Title = "SoruEkle";
+    Layout = "~/Views/Layout/smartClassLayout.cshtml";
+}
+@section Script{
+    <script>
+        var lock = false;
+        $(function () {
+            $.ajax({
+                type: "POST",
+                url: "http://192.168.1.42:5555/api/soru/getsorular",
+                dataType: "JSON",
+                success: function (val) {                    
+                    for (var i = 0; i < val.length; i++) {
+                        $("#sorularList").append('<div class="row"><div class="col-md-2">' + val[i].soruId + '</div><div class="col-md-2">' + val[i].dersAdi + '</div><div class="col-md-2">' + val[i].konuAdi + '</div><div class="col-md-2">' + val[i].altBaslikAdi + '</div><div class="col-md-2">' + val[i].cevap + '</div><div class="col-md-2"><button id="btnCikar" onclick="SoruCikarLock(' + val[i].soruId + ')" style="color:red;">ÇIKAR</button></div></div>');
+                    }
+                },
+                error: function (jqXHR, error, errorThrown) {
+                    if (jqXHR.status && jqXHR.status == 400)
+                        ShowMessage("info", "", jqXHR.responseText);
+                    else
+                        ShowMessage("error", "", "Beklenmeyen hata lütfen site yöneticisiyle iletişime geçin.");
+                }
+
+            })
+        });
+        function SoruCikarLock(soruId) {
+            if (!lock) {
+                lock = true;
+                SoruCikar(soruId);
+            }
+        }
+        function SoruCikar(soruId) {
+            $.ajax({
+                type: "GET",
+                url: "http://192.168.1.42:5555/api/soru/sorusil?soruId="+soruId,
+                dataType: "text",
+                success: function (val) {
+                    ShowMessage("success", "", val);
+                    setTimeout(function myfunction() {
+                        lock = false;
+                        location.reload();
+                    }, 1000);
+                },
+                error: function (jqXHR, error, errorThrown) {
+                    lock = false;
+                    if (jqXHR.status && jqXHR.status == 400)
+                        ShowMessage("info", "", jqXHR.responseText);
+                    else
+                        ShowMessage("error", "", "Beklenmeyen kayıt hatası lütfen site yöneticisiyle iletişime geçin.");
+                }
+
+            })
+        }
+    </script>
+}
+
+<!-- Inner Page Banner Area End Here -->
+<!-- Registration Page Area Start Here -->
+<div class="registration-page-area bg-secondary section-space-bottom">
+    <div class="container">
+        <br /><br />
+        <div class="row"style="color:red">
+            <div class="col-md-2">Soru Id</div>
+            <div class="col-md-2">Ders Ad</div>
+            <div class="col-md-2">Konu Ad</div>
+
+            <div class="col-md-2">Alt Başlık Ad</div>
+            <div class="col-md-2">Cevap</div>
+            <div class="col-md-2"></div>
+        </div>
+
+        <br />
+        <div id="sorularList">
+
+        </div>
+
+    </div>
+</div>
+

@@ -1,0 +1,39 @@
+﻿
+@{
+    ViewBag.Title = "HasError";
+    Layout = "~/Views/Layout/smartClassLayout.cshtml";
+}
+
+@{
+    Exception ex = null;
+    if (TempData["lastError"] != null)
+    {
+        ex = TempData["lastError"] as Exception;
+    }
+}
+<div class="pagination-area bg-secondary">
+    <div class="container">
+        <div class="pagination-wrapper">
+        </div>
+    </div>
+</div>
+<!-- Inner Page Banner Area End Here -->
+<!-- Registration Page Area Start Here -->
+<div class="registration-page-area bg-secondary section-space-bottom">
+    <div class="container">
+        <h1>Hata Oluştu.</h1>
+        <p>Lütfen site yöneticisiyle iletişime geçiniz.</p>
+        <br />
+        <br />
+        <br />
+        @if (ex != null)
+        {
+            <strong>Hata Detay : </strong>
+            @ex.Message
+            <br />
+            <br />
+            <br />
+            @Html.ActionLink("Ana Sayfaya Git!", "Index", "Home", null, new { @class = "btn btn-primary" })
+        }
+    </div>
+</div>

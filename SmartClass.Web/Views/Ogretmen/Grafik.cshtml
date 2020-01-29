@@ -1,0 +1,169 @@
+﻿@using SmartClass.Web.Models
+@using SmartClass.Web.ViewModels
+@model TestlerimPageViewModel
+@{
+    Layout = "~/Views/Layout/smartClassLayout.cshtml";
+}
+
+@{
+    int loginUserId = 0;
+
+    if ((Session["loginUser"] as UserModel) != null)
+    {
+        loginUserId = (Session["loginUser"] as UserModel).Id;
+    }
+}
+
+@section Script{
+    <script>
+        $(function () {
+            var locked = false;
+            // create initial empty chart
+            var ctx_live = document.getElementById("mycanvas");
+            var myChart = new Chart(ctx_live, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        data: [],
+                        borderWidth: 1,
+                        borderColor: '#00c0ef',
+                        label: 'liveCount',
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: "Öğrencinizin genel başarı yüzdeleri",
+                    },
+                    legend: {
+                        display: false
+                    },
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                            }
+                        }]
+                    }
+                }
+            });
+
+
+            var getir = function () {
+                locked = true;
+                clear();
+                var ogrenciNo = $("#no").val();
+
+                //Öğrencinin genel istatistiklerini çek
+                $.ajax({
+                    type: "GET",
+                    url: "http://192.168.1.42:5555/api/test/getgenelistatistikbyogrencino?ogrenciNo=" + ogrenciNo,
+                    dataType: "JSON",
+                    success: function (val) {
+                        for (var i = 0; i < val.length; i++) {
+                            myChart.data.labels.push(val[i].altBaslikAdi);
+                            myChart.data.datasets[0].data.push(val[i].basariYuzdesi);
+
+                        }
+                        myChart.update();
+                        locked = false;
+                    },
+                    error: function (jqXHR, error, errorThrown) {
+                        locked = false;
+                        if (jqXHR.status && jqXHR.status == 400)
+                            ShowMessage("info", "", jqXHR.responseText);
+                        else
+                            ShowMessage("error", "", "Beklenmeyen kayıt hatası lütfen site yöneticisiyle iletişime geçin.");
+                    }
+
+                })
+
+
+            }
+
+
+
+
+            var clear = function () {
+                for (var i = 0; i < 30; i++) {
+                    myChart.data.labels.pop();
+                    myChart.data.datasets[0].data.pop();
+                }
+            }
+
+            clear();
+
+            $(".btnOnayla").click(function () {
+                clear();
+                var ogrenciNo = $("#no").val();
+                if (ogrenciNo == null || ogrenciNo == "") {
+                    ShowMessage("info", "", "Lütfen okul no giriniz.");
+                }
+                else {
+                    if (!locked) {
+                        getir();
+                    }
+
+                }
+
+
+            });
+
+
+
+
+        });
+        $("#no").change(function () {
+            var max = parseInt($(this).attr('max'));
+            var min = parseInt($(this).attr('min'));
+            if ($(this).val() > max) {
+                $(this).val(max);
+                ShowMessage("info", "", "Okul No en fazla '999999' olabilir.");
+            }
+            else if ($(this).val() < min) {
+                $(this).val(min);
+                ShowMessage("info", "", "Okul No en az '1' olabilir.");
+
+            }
+        });
+    </script>
+}
+
+<div class="pagination-area bg-secondary">
+    <div class="container">
+        <div class="pagination-wrapper">
+        </div>
+    </div>
+</div>
+<!-- Inner Page Banner Area End Here -->
+<!-- Registration Page Area Start Here -->
+<div class="registration-page-area bg-secondary section-space-bottom">
+    <div class="container">
+        <h2 class="title-section">Öğretmen</h2>
+        <div class="registration-details-area inner-page-padding">
+            <div class="row">
+                <div class="col-md-2">
+                    <p>Öğrenci Okul No </p>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <div class="custom-select" style="width:300px;">
+                            <input id="no" class="form-control" type="number" step="1" min="1" max="999999" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button class="btnOnayla" style="background-color:orange;width:100px;height:51px;" type="submit" id="btnOnayla" name="btnOnayla" value="">Göster</button>
+                </div>
+            </div>
+            <hr />
+            <form id="personal-info-form">
+                <div class="row panel-body">
+                    <canvas id="mycanvas" width="300" height="200"></canvas>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

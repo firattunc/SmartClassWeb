@@ -1,0 +1,253 @@
+﻿@using SmartClass.Web.Models
+@using SmartClass.Web.ViewModels
+@model TestlerimPageViewModel
+@{
+    Layout = "~/Views/Layout/smartClassLayout.cshtml";
+}
+
+@{
+    int loginUserId = 0;
+
+    if ((Session["loginUser"] as UserModel) != null)
+    {
+        loginUserId = (Session["loginUser"] as UserModel).Id;
+    }
+}
+<div class="pagination-area bg-secondary">
+    <div class="container">
+        <div class="pagination-wrapper">
+            <ul>
+                <li><a href="/Home/Index">Anasayfa</a><span> -</span></li>
+                <li>Testler</li>
+            </ul>
+        </div>
+    </div>
+</div>
+<!-- Inner Page Banner Area End Here -->
+<!-- Registration Page Area Start Here -->
+<div class="registration-page-area bg-secondary">
+    <div class="container">
+        <h2 class="title-section">Testler</h2>
+        <div class="registration-details-area inner-page-padding">
+            <div class="row">
+                <div class="col-md-2">
+                    <p>Test seçiniz </p>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group">
+                        <div class="custom-select" style="width:300px;">
+                            @Html.DropDownListFor(x => x.selectedTestId, Model.testData, new { @class = "form-control dropdown" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button class="btnOnayla" style="background-color:orange;width:100px;height:51px;" type="submit" id="btnOnayla" name="btnOnayla" value="">Onayla</button>
+                </div>
+                <div class="col-md-2" style="margin-left:100px;">
+                    <h2 id="puan"></h2>
+                </div>
+            </div>
+
+            <hr />
+            <form id="personal-info-form">
+                <div class="row panel-body">
+                    <canvas id="mycanvas" width="300" height="200"></canvas>
+                </div>
+
+            </form>
+            <hr />
+            <h2>Yorumlar</h2>
+
+            <hr />
+            <div class="message-wrapper">
+
+            </div>
+            <hr />
+            <div class="single-item-message">
+                <h3>Teste bir yorum bırak</h3>
+                <div class="leave-comments-message">
+                    <div class="leave-comments-box">
+                        <textarea id="message" placeholder="Write your comment here ...*" class="textarea form-control" name="message"></textarea>
+                        <button id="yorumGonder" type="submit" class="update-btn">Gönder</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+
+@section Script{
+    <script>
+        $(function () {            
+            var ddlTest = $("#selectedTestId");
+            $("#selectedTestId option").not(":first").remove();
+            $.ajax({
+                method: "POST",
+                url: 'http://192.168.1.42:5555/api/test/gettestlerbykullaniciid?kullaniciId=' + @loginUserId
+            }).done(function (result) {
+                for (var i = 0; i < result.length; i++) {
+                    var tarih = result[i].tarih;
+                    var id = result[i].id;
+
+                    var opt = $("<option></option>");
+                    opt.text(tarih);
+                    opt.attr("value", id);
+                    ddlTest.append(opt);
+                }
+            })
+
+        var id;
+        var ogrenciId
+        // create initial empty chart
+        var ctx_live = document.getElementById("mycanvas");
+        var myChart = new Chart(ctx_live, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    data: [],
+                    borderWidth: 1,
+                    borderColor: '#00c0ef',
+                    label: 'liveCount',
+                }]
+            },
+            options: {
+                responsive: true,
+                title: {
+                    display: true,
+                    text: "Çözdüğün testin başarı yüzdeleri",
+                },
+                legend: {
+                    display: false
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                        }
+                    }]
+                }
+            }
+        });
+        
+        var getir = function () {                
+            clear();
+
+                var testId = $("#selectedTestId").val();
+            $(".message-wrapper").empty();
+            $.ajax({
+                method: "GET",
+                async:false,
+                url: "http://192.168.1.42:5555/api/yorum/getyorumlar?testId=" + testId,
+                dataType: "JSON",
+                success: function (val) {
+                    for (var i = 0; i < val.length; i++) {
+                         $(".message-wrapper").append(' <div class="single-item-message"><div class="single-item-inner"><div class="item-content"><h4>' + val[i].tarih + '</h4><p>' + val[i].metin + '</p ><button name="btnSil" value="' + val[i].id + '" class="btn-danger btnSil">Sil</button></div ></div ></div >');
+                    }
+
+                }
+
+            })
+            $.ajax({
+                method: "GET",
+                url: "http://192.168.1.42:5555/api/test/puangetir?testId=" + testId,
+                async: false,
+                success: function (data) {
+                    $("#puan").text("Puan:" + data);
+                }
+            })
+            
+            $.ajax({
+                type: "GET",
+                url: "http://192.168.1.42:5555/api/test/gettestistatistik?testId="+testId,
+                dataType: "JSON",
+                async:false,
+                success: function (val) {                    
+                    for (var i = 0; i < val.length; i++) {
+                        myChart.data.labels.push(val[i].altBaslikAdi);
+                        myChart.data.datasets[0].data.push(val[i].basariYuzdesi*100);
+                    }
+
+                    myChart.update();
+
+                }
+            })
+        }
+        var clear = function () {
+            for (var i = 0; i < 30; i++) {
+                myChart.data.labels.pop();
+                myChart.data.datasets[0].data.pop();
+            }
+        }
+        var yorumYap = function () {
+            var yorum = $("#message").val();
+            var testId = $("#selectedTestId").val();
+            var yorumModel = {"metin": yorum,"testSonucId": testId, "ogrenciId": @loginUserId}
+            $.ajax({
+                url: "http://192.168.1.42:5555/api/yorum/yorumyap",
+                type: "POST",
+                data: JSON.stringify(yorumModel),
+                contentType: "application/json",
+                dataType: "json",
+                success: function (data) {
+                    ShowMessage("success", "", data.message);
+                                setTimeout(function myfunction() {
+                                    window.location.reload();
+                                }, 1000);
+                },
+                error: function (jqXHR, error, errorThrown) {
+                    if (jqXHR.status && jqXHR.status == 400)
+                        ShowMessage("error", "Test Hatası", jqXHR.responseText);
+                    else
+                        ShowMessage("error", "Test Hatası", "Beklenmeyen test hatası lütfen site yöneticisiyle iletişime geçin.");
+                }
+            })
+
+        }
+
+        
+
+        $(".btnOnayla").click(function () {
+            getir();
+
+        });
+        $(".message-wrapper").on("click", ".btnSil", function () {
+            var yorumId = $(this).val();
+
+            $.ajax({
+                method: "DELETE",
+                url: "http://192.168.1.42:5555/api/yorum/yorumsil?yorumId=" + yorumId,
+                async: false,
+                 success: function (data) {
+                    ShowMessage("success", "", data);
+                    setTimeout(function myfunction() {
+                        window.location.reload();
+                    }, 1000);
+                },
+                error: function (jqXHR, error, errorThrown) {
+                    if (jqXHR.status && jqXHR.status == 400)
+                        ShowMessage("error", "Yorum Hatası", jqXHR.responseText);
+                    else
+                        ShowMessage("error", "Yorum Hatası", "Beklenmeyen test hatası lütfen site yöneticisiyle iletişime geçin.");
+                }
+            })
+        });
+        $("#yorumGonder").click(function () {
+            var yorum = $("#message").val();
+            if (yorum == "" || yorum == null) {
+                ShowMessage("info", "", "Lütfen bir yorum yazınız.");
+            } else {
+                yorumYap();
+            }
+        });
+
+
+
+
+        });
+    </script>
+}

@@ -1,0 +1,121 @@
+﻿@using SmartClass.Web.Models
+@{
+    Layout = "~/Views/Layout/smartClassLayout.cshtml";
+}
+@{
+    int loginUserId = 0;
+
+    if ((Session["loginUser"] as UserModel) != null)
+    {
+        loginUserId = (Session["loginUser"] as UserModel).Id;
+    }
+}
+@section Script{
+    <script>
+        var lock = false;
+        function OgrenciSilLock(ooId) {
+            if (!lock) {
+                lock = true;
+                OgrenciSil(ooId);
+            }
+        }
+        function OgrenciSil(ooId) {
+            $.ajax({
+                type: "DELETE",
+                url: "http://192.168.1.42:5555/api/ogretmen/ogrencisil?ogrenciOgretmeniId=" + ooId,
+                dataType: "JSON",
+                success: function (val) {                                        
+                    ShowMessage("success", "", val.message);
+                    setTimeout(function myfunction() {
+                        locked = false;
+                        window.location.reload();
+                    }, 1000);
+                },
+                error: function (jqXHR, error, errorThrown) {  
+                    locked = false;
+                    if (jqXHR.status && jqXHR.status == 400)
+                        ShowMessage("info", "", jqXHR.responseText);
+                    else
+                        ShowMessage("error", "", "Beklenmeyen öğrenci silme hatası lütfen site yöneticisiyle iletişime geçin.");
+                }
+            });
+        }
+        $(function () {
+
+            $.ajax({
+                    type: "GET",
+                    url: "http://192.168.1.42:5555/api/ogretmen/getogrenciler?kullaniciId="+@loginUserId,
+                    dataType: "JSON",
+                    success: function (val) {                        
+                        for (var i = 0; i < val.length; i++) {                            
+                            $("#quantity-holder").append('<tr><td class="cart-img-holder"><a href="#"><img src="~/Content/img/404.png" alt="cart" class="img-responsive"></a></td><td><h3><a href="#">'+val[i].ogrenciAdSoyAd+'</a></h3></td><td class="quantity"><h3><a href="#">'+val[i].ogrenciNo+'</a></h3></td><td class="dismiss"><a onclick="OgrenciSilLock('+val[i].ogrenciOgretmeniId+')" "><i class="fa fa-times" aria-hidden="true"></i></a></td></tr>');
+                        }
+                    },
+                    error: function (jqXHR, error, errorThrown) {                        
+                        if (jqXHR.status && jqXHR.status == 400)
+                            ShowMessage("info", "", jqXHR.responseText);
+                        else
+                            ShowMessage("error", "", "Beklenmeyen  hata lütfen site yöneticisiyle iletişime geçin.");
+                    }
+
+                })
+        });
+        $( "#no" ).change(function() {
+          var max = parseInt($(this).attr('max'));
+          var min = parseInt($(this).attr('min'));
+          if ($(this).val() > max)
+          {
+              $(this).val(max);
+               ShowMessage("info", "", "Okul No en fazla '999999' olabilir.");
+          }
+          else if ($(this).val() < min)
+          {
+              $(this).val(min);
+              ShowMessage("info", "", "Okul No en az '1' olabilir.");
+             
+          }       
+        });
+    </script>
+}
+<div class="pagination-area bg-secondary">
+    <div class="container">
+        <div class="pagination-wrapper">
+        </div>
+    </div>
+</div>
+<!-- Registration Page Area Start Here -->
+<div class="registration-page-area bg-secondary section-space-bottom">
+    <div class="container">
+        @if (TempData["isSuccess"] != null)
+        {
+            <div class="alert-@TempData["alert"]">
+                @TempData["isSuccess"]
+            </div>
+        }
+
+        <h3 style="color:#8bc34a;padding-left:20px;">Öğrencileriniz</h3>
+        <!-- Cart Page Area Start Here -->
+        <div class="cart-page-area">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="cart-page-top table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <td class="cart-form-heading"></td>
+                                        <td class="cart-form-heading">AD</td>
+                                        <td class="cart-form-heading">No</td>
+                                    </tr>
+                                </thead>
+                                <tbody id="quantity-holder">
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

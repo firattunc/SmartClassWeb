@@ -1,0 +1,249 @@
+﻿@using SmartClass.Web.ViewModels
+@model RegisterViewModel
+@{
+    Layout = "~/Views/Layout/smartClassLayout.cshtml";
+}
+@section Script{
+    <script>
+        var lock = false;
+        $(function myfunction() {
+            var ddlIl = $("#selectedIlId");
+            $("#selectedIlId option").not(":first").remove();
+            $.ajax({
+                method: "GET",
+                url: 'http://192.168.1.42:5555/api/auth/getiller',
+            }).done(function (result) {
+
+                var ddlIl = $("#selectedIlId");
+                for (var i = 0; i < result.length; i++) {
+                    console.log(result[i]);
+
+                    var ilAd = result[i].ilAd;
+                    var ilId = result[i].id;
+
+                    var opt = $("<option></option>");
+                    opt.text(ilAd);
+                    opt.attr("value", ilId);
+                    ddlIl.append(opt);
+                }
+            })
+        });
+        function RegisterLock() {
+            if (!lock) {
+                lock = true;
+                Register();
+            }
+        }
+        function Register() {
+            var model = {
+                ad: $("#ad").val(), soyad: $("#soyad").val(), kullaniciAdi: $("#kullaniciAdi").val(), sifre: $("#sifre").val(), no: $("#no").val()
+                , selectedIlId: $("#selectedIlId").val(), selectedOkulId: $("#selectedOkulId").val(), selectedIlceId: $("#selectedIlceId").val()
+            };
+            if (model.kullaniciAdi.trim() != "" && model.sifre.trim() != ""
+                && model.ad.trim() != "" && model.soyad.trim() != "" && model.no.trim() != "" &&
+                model.selectedIlId.trim() != "" &&
+                model.selectedOkulId.trim() != "" &&
+                model.selectedIlceId.trim() != ""
+            ) {
+                $.ajax({
+                    url: "http://192.168.1.42:5555/api/auth/register",
+                    type: "POST",
+                    data: JSON.stringify(model),
+                    contentType: "application/json",
+                    dataType: "JSON",
+                    success: function (e) {
+                        $.ajax({
+                            url: "/home/loginol",
+                            type: "post",
+                            data: JSON.stringify(e),
+                            contentType: "application/json",
+                            dataType: "json",
+                            success: function (result) {
+
+                                ShowMessage("success", "Kayıt Başarılı", "Yönlendiriliyorsunuz..");
+                                setTimeout(function myfunction() {
+                                    lock = false;
+                                    window.location = "/Home/Index";
+                                }, 1000);
+
+                            }
+                        })
+                    },
+                    error: function (jqXHR, error, errorThrown) {
+                        lock = false;
+                        if (jqXHR.status && jqXHR.status == 400)
+                            ShowMessage("error", "Kayıt Hatası", jqXHR.responseText);
+                        else
+                            ShowMessage("error", "Kayıt Hatası", "Beklenmeyen kayıt hatası lütfen site yöneticisiyle iletişime geçin.");
+                    }
+                });
+            } else {
+                lock = false;
+                ShowMessage("warning", "Boş Geçilemez", "Lütfen tüm alanları doldurun.");
+            }
+        }
+        $( "#no" ).change(function() {
+          var max = parseInt($(this).attr('max'));
+          var min = parseInt($(this).attr('min'));
+          if ($(this).val() > max)
+          {
+              $(this).val(max);
+               ShowMessage("info", "", "Okul No en fazla '999999' olabilir.");
+          }
+          else if ($(this).val() < min)
+          {
+              $(this).val(min);
+              ShowMessage("info", "", "Okul No en az '1' olabilir.");
+             
+          }       
+        });
+        $("#selectedIlId").change(function () {
+            var ddlIl = $(this);
+            var IlId = ddlIl.val();
+            if (IlId != "" | IlId != "-1") {
+                $("#selectedIlceId option").not(":first").remove();
+                $.ajax({
+                    method: "GET",
+                    url: 'http://192.168.1.42:5555/api/auth/getilcelerbyil?id=' + IlId
+                }).done(function (result) {
+                    var ddlIlce = $("#selectedIlceId");
+                    for (var i = 0; i < result.length; i++) {
+                        var ilceAd = result[i].ilceAd;
+                        var ilceId = result[i].id;
+
+                        var opt = $("<option></option>");
+                        opt.text(ilceAd);
+                        opt.attr("value", ilceId);
+                        ddlIlce.append(opt);
+                    }
+                })
+            }
+            else {
+                $("#selectedIlceId option").not(":first").remove();
+            }
+        });
+        $("#selectedIlceId").change(function () {
+            var ddlIlce = $(this);
+            var IlceId = ddlIlce.val();
+            if (IlceId != "" | IlceId != "-1") {
+                $("#selectedOkulId option").not(":first").remove();
+                $.ajax({
+                    method: "GET",
+                    url: 'http://192.168.1.42:5555/api/auth/getokullarbyilceid?id=' + IlceId
+                }).done(function (result) {
+
+                    var ddlIlce = $("#selectedOkulId");
+                    for (var i = 0; i < result.length; i++) {
+                        var ilceAd = result[i].okulAdi;
+                        var ilceId = result[i].id;
+                        var opt = $("<option></option>");
+                        opt.text(ilceAd);
+                        opt.attr("value", ilceId);
+                        ddlIlce.append(opt);
+                    }
+                })
+
+            }
+            else {
+                $("#selectedOkulId option").not(":first").remove();
+            }
+        });
+
+    </script>
+}
+
+<!-- Header Area End Here -->
+<!-- Inner Page Banner Area Start Here -->
+<div class="pagination-area bg-secondary">
+    <div class="container">
+        <div class="pagination-wrapper">
+            <ul>
+                <li><a href="/Home/Index">Anasayfa</a><span> -</span></li>
+                <li>Kayıt Ol</li>
+            </ul>
+        </div>
+    </div>
+</div>
+<!-- Inner Page Banner Area End Here -->
+<!-- Registration Page Area Start Here -->
+<div class="registration-page-area bg-secondary section-space-bottom">
+    <div class="container">
+        <h2 class="title-section">Kayıt Ol</h2>
+        <div class="registration-details-area inner-page-padding main-content">
+
+            <form id="personal-info-form">
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            <label class="control-label" for="first-name">Adınız *</label>
+                            @Html.TextBoxFor(x => x.ad, new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            <label class="control-label" for="last-name">Soyadınız *</label>
+                            @Html.TextBoxFor(x => x.soyad, new { @class = "form-control" })
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            <label class="control-label" for="email">Kullanıcı adınız *</label>
+                            @Html.TextBoxFor(x => x.kullaniciAdi, new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            <label class="control-label" for="phone">Sifreniz *</label>
+                            @Html.TextBoxFor(x => x.sifre, new { @class = "form-control", @type = "password" })
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="control-label">Okul No *</label>
+                            @Html.TextBoxFor(x => x.no, new { @class = "form-control", @type = "number", @step = "1",@min="1",@max="999999" })
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            <label class="control-label" for="district">İl *</label>
+                            <div class="custom-select">
+                                @Html.DropDownListFor(x => x.selectedIlId, Model.ilData, "Lütfen seçiniz", new { @class = "form-control dropdown" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                        <div class="form-group">
+                            <label class="control-label" for="district">İlce *</label>
+                            @Html.DropDownListFor(x => x.selectedIlceId, Model.ilceData, "Lütfen seçiniz", new { @class = "form-control dropdown" })
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                        <div class="form-group">
+                            <label class="control-label">Okulunuz</label>
+                            <div class="custom-select">
+                                @Html.DropDownListFor(x => x.selectedOkulId, Model.okulData, "Lütfen seçiniz", new { @class = "form-control dropdown" })
+                            </div>
+                        </div>
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="pLace-order">
+                                <button class="update-btn disabled" type="button" onclick="RegisterLock()" value="Login">Onayla</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+        </div>
+    </div>
+</div>
+}
+<!-- Registration Page Area End Here -->
+<!-- Footer Area Start Here -->

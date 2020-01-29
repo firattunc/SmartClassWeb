@@ -1,0 +1,197 @@
+﻿@using SmartClass.Web.ViewModels
+@model SoruKayitViewModel
+@{
+    ViewBag.Title = "SoruEkle";
+    Layout = "~/Views/Layout/smartClassLayout.cshtml";
+}
+@section Script {
+    <script>
+        var image = "";
+        var lock = false;
+        $(function myfunction() {
+            var ddlDers = $("#selectedDersId");
+            $("#selectedDersId option").not(":first").remove();
+            $.ajax({
+                method: "GET",
+                url: 'http://192.168.1.42:5555/api/soru/getdersler',
+            }).done(function (result) {
+
+                for (var i = 0; i < result.length; i++) {
+
+                    var dersAdi = result[i].dersAdi;
+                    var dersId = result[i].id;
+
+                    var opt = $("<option></option>");
+                    opt.text(dersAdi);
+                    opt.attr("value", dersId);
+                    ddlDers.append(opt);
+                }
+            })
+            var ddlKonu = $("#selectedKonuId");
+            $("#selectedKonuId option").not(":first").remove();
+            $.ajax({
+                method: "GET",
+                url: 'http://192.168.1.42:5555/api/soru/getkonular',
+            }).done(function (result) {
+
+                for (var i = 0; i < result.length; i++) {
+
+                    var konuAdi = result[i].konuAdi;
+                    var konuId = result[i].id;
+
+                    var opt = $("<option></option>");
+                    opt.text(konuAdi);
+                    opt.attr("value", konuId);
+                    ddlKonu.append(opt);
+                }
+            })
+
+        });
+        function UpdateImage(e) {
+            image = e;
+        }
+        function SoruEkleLock() {
+            if (!lock) {
+                lock = true;
+                SoruEkle();
+            }
+        }
+        function SoruEkle() {
+
+            var modelSoru = {
+                AltBaslikId: $("#selectedAltBaslikId").val(), KonuId: $("#selectedKonuId").val(), DersId: $("#selectedDersId").val(), Cevap: $("#Cevap").val(), ImgUrl: ""
+            };
+            if (modelSoru.AltBaslikId.trim() != "" && modelSoru.KonuId.trim() != ""
+                && modelSoru.DersId.trim() != "" && modelSoru.Cevap.trim() != "" && image != ""
+            ) {
+                ShowMessage("info", "", "Soru ekleniyor..");
+                var data = new FormData();
+                data.append("link", image.files[0]);
+                $.ajax({
+                    url: "/sorugorevlisi/soruekle",
+                    type: "POST",
+                    data: data,
+                    cache: false,
+                    processData: false,
+                    contentType: false,
+                    success: function (ImgUrl) {
+                        if (ImgUrl == false)
+                            ShowMessage("danger", "", "Soru eklenirken hatayla karşılaşıldı.");
+                        else {
+                            modelSoru.ImgUrl = ImgUrl;
+                            $.ajax({
+                                url: "http://192.168.1.42:5555/api/soru/soruekle",
+                                type: "post",
+                                data: JSON.stringify(modelSoru),
+                                contentType: "application/json",
+                                dataType: "text",
+                                success: function (result) {                                    
+                                    ShowMessage("success", "", result);
+                                    setTimeout(function myfunction() {
+                                        lock = false;
+                                        location.reload();
+                                    }, 1000);
+                                },
+                                error: function (jqXHR, error, errorThrown) {
+                                    lock = false;
+                                    if (jqXHR.status && jqXHR.status == 400)
+                                        ShowMessage("error", "Soru Ekleme Hatası", jqXHR.responseText);
+                                    else
+                                        ShowMessage("error", "Soru Ekleme Hatası", "Beklenmeyen soru ekleme hatası lütfen site yöneticisiyle iletişime geçin.");
+                                }
+                            })
+                        }
+                    }
+
+                });
+            } else {
+                lock = false;
+                ShowMessage("warning", "Boş Geçilemez", "Lütfen tüm alanları doldurun.");
+            }
+        }
+        $("#selectedKonuId").change(function () {
+            var ddlKonu = $(this);
+            var KonuId = ddlKonu.val();
+            if (KonuId != "" | KonuId != "-1") {
+                $("#selectedAltBaslikId option").not(":first").remove();
+                $.ajax({
+                    method: "GET",
+                    url: 'http://192.168.1.42:5555/api/soru/getaltbasliklarbykonuid?konuId=' + KonuId,
+                }).done(function (result) {
+                    var ddlAltBaslik = $("#selectedAltBaslikId");
+                    for (var i = 0; i < result.length; i++) {
+
+                        var altBaslikAdi = result[i].altBaslikAdi;
+                        var altBaslikId = result[i].id;
+
+                        var opt = $("<option></option>");
+                        opt.text(altBaslikAdi);
+                        opt.attr("value", altBaslikId);
+                        ddlAltBaslik.append(opt);
+                    }
+                })
+            }
+            else {
+                $("#selectedDersId option").not(":first").remove();
+            }
+        });
+
+    </script>
+}
+<div class="pagination-area bg-secondary">
+    <div class="container">
+        <div class="pagination-wrapper">
+        </div>
+    </div>
+</div>
+<!-- Inner Page Banner Area End Here -->
+<!-- Registration Page Area Start Here -->
+<div class="registration-page-area bg-secondary section-space-bottom">
+    <div class="container">
+        <div class="container">
+            <h3>Soru Ekle</h3>
+            <form id="personal-info-form">
+                <div class="row">
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                        <div class="form-group">
+                            <label class="control-label" for="district">Ders *</label>
+                            @Html.DropDownListFor(x => x.selectedDersId, Model.dersData, "Ders seçiniz", new { @class = "form-control dropdown" })
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                        <div class="form-group">
+                            <label class="control-label" for="district">Konu *</label>
+                            @Html.DropDownListFor(x => x.selectedKonuId, Model.konuData, "Konu seçiniz", new { @class = "form-control dropdown" })
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-md-3 col-sm-3 col-xs-6">
+                        <div class="form-group">
+                            <label class="control-label" for="district">Alt Başlık *</label>
+                            @Html.DropDownListFor(x => x.selectedAltBaslikId, Model.altBaslikData, "Alt Başlık seçiniz", new { @class = "form-control dropdown" })
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-6">
+                        <div class="form-group">
+                            <label class="control-label" for="district">Cevap *</label>
+                            @Html.DropDownListFor(x => x.Cevap, new SelectList(new string[4] { "A", "B", "C", "D" }), "Cevap seçiniz", new { @class = "form-control dropdown" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row col-12">
+                    <div class="input-group col-9">
+                        <div class="custom-file">
+                            <input id="fileSelect" type="file" accept="image/*" onchange="UpdateImage(this)" style="display:block;" />
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <button type="button" onclick="SoruEkleLock()" class="btn btn-primary" value="Soru_Kayıt">Kaydet</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+
+    </div>
+</div>
+

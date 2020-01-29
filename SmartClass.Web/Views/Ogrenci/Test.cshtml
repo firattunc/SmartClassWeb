@@ -1,0 +1,248 @@
+﻿@using SmartClass.Web.Models
+@{
+    Layout = "~/Views/Layout/smartClassLayout.cshtml";
+
+}
+@{
+
+    int loginUserId = 0;
+
+    if ((Session["loginUser"] as UserModel) != null)
+    {
+        loginUserId = (Session["loginUser"] as UserModel).Id;
+    }
+}
+
+<div class="row">
+    <div class="pagination-align-center">
+        <div id="progressbar">
+            <div style="width: 0%;">
+            </div>
+        </div>
+        <p>
+            <span class="soruNo">
+
+            </span>
+
+        </p>
+        <div id="countdown" style="padding-left:1200px;">
+            <b style="color:#e74c3c !important">Kalan Süre  :</b>  <span id="demo"></span>
+        </div>
+    </div>
+
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <img id="img" class="img-responsive center-block soru" style="width:400px;height:400px;" src="" />
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <ul class="pagination-align-center">
+            <li class="active"><button class="cevapButton yuvarlak">A</button></li>
+            <li><button class="cevapButton yuvarlak">B</button></li>
+            <li><button class="cevapButton yuvarlak">C</button></li>
+            <li><button class="cevapButton yuvarlak">D</button></li>
+        </ul>
+    </div>
+</div>
+
+
+
+@section Script{
+    <script>
+
+        var locked = false;
+    var testBitisDate;
+    var countDownDate;
+    var soruSayisi;
+    const monthNames = ["January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"];
+
+    function Cevapla(cevapText) {
+            locked = true;
+            var cevap = cevapText;
+
+        $.ajax({
+            url: "@Url.Action("GetSoruId")",
+            type: "post",
+            async:false,
+            dataType: "json",
+            success: function (e) {
+                var cevapModel = { IsTrue:cevap , OgrenciId:@loginUserId, SoruId: e };
+                $.ajax({
+                    url: "http://192.168.1.42:5555/api/cevap/cevapla",
+                    type: "post",
+                    data: JSON.stringify(cevapModel),
+                    contentType: "application/json",
+                    dataType: "json",
+                    success: function (result) {
+
+
+                    }
+
+                })
+            }
+        })
+
+        $.ajax({
+            method: "POST",
+            async:false,
+            url: '@Url.Action("GetSoru")' + '/' + 2,
+            contentType: "application/json; charset=utf-8",
+            dataType: "json",
+        }).done(function (soru) {
+
+            if (soru == soruSayisi+1) {
+                window.location.href = "/Ogrenci/Testler";
+            }
+            $(".soru").attr("src", soru);
+        })
+            $.ajax({
+                method: "GET",
+                async: false,
+            url:'@Url.Action("GetSoruNo")'
+        }).done(function (soruNo) {
+
+
+                $.ajax({
+                method: "GET",
+                async: false,
+            url:'@Url.Action("GetSoruSayisi")'
+                }).done(function (soruSayisi) {
+
+                    var barYuzde = (100 / soruSayisi) * soruNo;
+                    $("#progressbar > div").css("width", barYuzde + "%");
+                    $(".soruNo").text(soruNo + "/" + soruSayisi);
+                })
+
+
+        })
+        var tmpImg = new Image() ;
+        tmpImg.src = $('#img').attr('src');
+        tmpImg.insertBefore
+        tmpImg.onload = function() {
+            locked = false;
+        };
+        
+        
+    }
+    $(".cevapButton").click(function () {
+        if (!locked) {
+            cevapText=$(this).text();
+            Cevapla(cevapText);
+        }
+    });
+
+    $(function () {
+      
+        //Testin Bitiş Süresini Ata
+        var currentdate = new Date();
+        var dateTime = currentdate.getFullYear() + "-"
+            + (currentdate.getMonth() + 1) + "-"
+            + currentdate.getDate() + " "
+            + currentdate.getHours() + ":"
+            + currentdate.getMinutes() + ":"
+            + currentdate.getSeconds();
+
+        $.ajax({
+            method: "GET",
+            url: "http://192.168.1.42:5555/api/test/gettestbitistarih?kullaniciId=" +@loginUserId,
+            async:true,
+            dataType: "JSON",
+            success: function (result) {
+
+                testBitisDate = result;
+                var d = new Date(Date.parse(testBitisDate));
+                year = d.getFullYear();
+                month = pad(d.getMonth());
+                day = pad(d.getDate());
+                hour = pad(d.getHours());
+                minutes = pad(d.getMinutes());
+                seconds=pad(d.getSeconds());
+                finalDate = year + "-" + month + "-" + day + " " + hour + ":" + minutes;
+                time = monthNames[currentdate.getMonth()] + day + '' + ', ' + year + ' ' + hour + ': ' + minutes + ': ' + seconds;
+                var countDownDate1 = new Date(time);
+
+                var countDownDate2 = new Date(countDownDate1);
+
+                countDownDate = countDownDate2.getTime();
+
+            }
+
+        })
+        $.ajax({
+            method: "POST",
+            async: true,
+            url:'@Url.Action("GetSoru")'+'/' + 1
+        }).done(function (result) {
+            $(".soru").attr("src", result);
+        })
+         $.ajax({
+             method: "GET",
+             async: true,
+            url:'@Url.Action("GetSoruNo")'
+        }).done(function (soruNo) {
+
+            $("#progressbar > div").css("width", soruNo * 2 + "%");
+             $.ajax({
+                 method: "GET",
+                 async: true,
+            url:'@Url.Action("GetSoruSayisi")'
+             }).done(function (soruCount) {
+
+                 $(".soruNo").text(soruNo + "/" + soruCount);
+                 soruSayisi = soruCount;
+             })
+
+
+        })
+    });
+
+
+
+    function pad(num) {
+        num = "0" + num;
+        return num.slice(-2);
+    }
+
+    // Update the count down every 1 second
+    var x = setInterval(function () {
+        // Get today's date and time
+
+        var now = new Date().getTime();
+        // Find the distance between now and the count down date
+        var distance = countDownDate-now;
+        // Time calculations for days, hours, minutes and seconds
+        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        // Output the result in an element with id="demo"
+        document.getElementById("demo").innerHTML = hours + "s "
+            + minutes + "d " + seconds + "s ";
+
+        // If the count down is over, write some text
+        if (distance < 0) {
+            clearInterval(x);
+            document.getElementById("demo").innerHTML = "EXPIRED";
+            $.ajax({
+                type: "POST",
+                url: "/Ogrenci/TestiBitir",
+                data: {},
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (response) {
+                }
+            });
+
+            window.location = "/Home/Testler";
+
+
+        }
+    }, 1000);
+
+    </script>
+}
+
+

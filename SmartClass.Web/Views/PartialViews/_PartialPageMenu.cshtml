@@ -1,0 +1,72 @@
+﻿@using SmartClass.Web.Models
+@{
+    int CurrentRoleId = 0;
+    if (Session["loginUser"] != null)
+    {
+        CurrentRoleId = (Session["loginUser"] as UserModel).CurrentRoleId;
+    }
+}
+
+<link href="~/Content/css/style.css" rel="stylesheet" />
+
+<ul>
+    <li class="active">
+        <a href="/Home/Index">Anasayfa</a>
+    </li>
+    @if (CurrentRoleId != 0)
+    {
+        if (CurrentRoleId == 1)
+        {
+            <li>
+                @Html.ActionLink("Test", "TestStart", "Ogrenci")
+            </li>
+            <li>
+                @Html.ActionLink("Genel Başarı Grafiği", "Grafikler", "Ogrenci")
+            </li>
+            <li>
+                @Html.ActionLink("Girdiğim Testler", "Testler", "Ogrenci")
+            </li>
+            <li>
+                @Html.ActionLink("Puan Grafiği", "PuanGrafik", "Ogrenci")
+            </li>
+        }
+
+
+        if (CurrentRoleId == 2)
+        {
+            <li>
+                @Html.ActionLink("İstatistikler", "Grafik", "Ogretmen")
+            </li>
+            <li>
+                @Html.ActionLink("Ogrencileri Listele/Düzenle", "Listele", "Ogretmen")
+            </li>
+            <li>
+                @Html.ActionLink("Ogrenci Ekle", "OgrenciEkle", "Ogretmen")
+            </li>
+        }
+        if (CurrentRoleId == 4)
+        {
+            <li>
+                @Html.ActionLink("Soruları Listele", "Sorular", "SoruGorevlisi")
+            </li>
+            <li>
+                @Html.ActionLink("Soru Ekle", "SoruEkle", "SoruGorevlisi")
+            </li>
+        }
+        if (CurrentRoleId == 3)
+        {
+            <li>
+                @Html.ActionLink("Öğrenci Başarı Grafikleri", "Grafik", "Veli")
+            </li>
+        }
+        if (CurrentRoleId == 5)
+        {
+            <li>
+                @Html.ActionLink("Kullanıcı Ekle", "KullaniciEkle", "Admin")
+            </li>
+        }
+    }
+
+
+</ul>
+ 
