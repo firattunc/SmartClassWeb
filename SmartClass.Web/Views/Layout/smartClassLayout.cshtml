@@ -9,14 +9,7 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <title>Akıllı Sınıf | Testler </title>
     <meta name="description" content="">
-    <meta name="viewport" content="width=device-width, initial-scale=1">   
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
-    <!-- FOR DEMO PURPOSES ONLY. You should remove this in your project -->
-    <link href="~/Content/AdminContent/css/demo.css" rel="stylesheet" />
-    <!-- GOOGLE FONTS -->
-    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700" rel="stylesheet">
-    <!-- ICONS -->
-    <link rel="icon" type="image/png" sizes="96x96" href="~/Content/AdminContent/img/favicon.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
     <!-- Normalize CSS -->
     <link href="~/Content/css/normalize.css" rel="stylesheet" />
@@ -24,21 +17,6 @@
     <link href="~/Content/css/main.css" rel="stylesheet" />
     <!-- Bootstrap CSS -->
     <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
-    <!-- Animate CSS -->
-    <link href="~/Content/css/animate.min.css" rel="stylesheet" />
-    <!-- Font-awesome CSS-->
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-    <!-- Owl Caousel CSS -->
-    <link href="~/Scripts/vendor/OwlCarousel/owl.carousel.min.css" rel="stylesheet" />
-    <link href="~/Scripts/vendor/OwlCarousel/owl.theme.default.min.css" rel="stylesheet" />
-    <!-- Main Menu CSS -->
-    <link href="~/Content/css/meanmenu.min.css" rel="stylesheet" />
-    <!-- Datetime Picker Style CSS -->
-    <link href="~/Content/css/jquery.datetimepicker.css" rel="stylesheet" />
-    <!-- ReImageGrid CSS -->
-    <link href="~/Content/css/reImageGrid.css" rel="stylesheet" />
-    <!-- Switch Style CSS -->
-    <link href="~/Content/css/hover-min.css" rel="stylesheet" />
     <!-- Custom CSS -->
     <link href="~/Content/css/style.css" type="text/css" rel="stylesheet" />
     <!-- Modernizr Js -->
@@ -142,7 +120,7 @@
     </style>
 </head>
 <body>
-    
+
     <!-- Main Body Area Start Here -->
     <div id="wrapper">
         <!-- Header Area Start Here -->
@@ -255,90 +233,90 @@
     <script src="~/Scripts/plugins.js"></script>
     <!-- Bootstrap js -->
     <script src="~/Scripts/bootstrap.min.js"></script>
-    <!-- WOW JS -->
+    <!-- WOW JS-->
     <script src="~/Scripts/wow.min.js"></script>
-    <!-- Owl Cauosel JS -->
+    <!-- Owl Cauosel JS-->
     <script src="~/Scripts/vendor/OwlCarousel/owl.carousel.min.js"></script>
-    <!-- Meanmenu Js -->
+    <!-- Meanmenu Js-->
     <script src="~/Scripts/jquery.meanmenu.min.js"></script>
-    <!-- Srollup js -->
+    <!-- Srollup js-->
     <script src="~/Scripts/jquery.scrollUp.min.js"></script>
-    <!-- jquery.counterup js -->
+    <!-- jquery.counterup js-->
     <script src="~/Scripts/jquery.counterup.min.js"></script>
     <script src="~/Scripts/waypoints.min.js"></script>
     <!-- Isotope js -->
     <script src="~/Scripts/isotope.pkgd.min.js"></script>
-    <!-- Gridrotator js -->
+    <!-- Gridrotator js-->
     <script src="~/Scripts/jquery.gridrotator.js"></script>
     <!-- Custom Js -->
     <script src="~/Scripts/main.js"></script>
 
-    <script src="~/node_modules/jquery-validation/dist/jquery.validate.min.js"></script>
-    <script src="~/node_modules/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>
+    <!--<script src="~/node_modules/jquery-validation/dist/jquery.validate.min.js"></script>-->
+    <!--<script src="~/node_modules/jquery-validation-unobtrusive/dist/jquery.validate.unobtrusive.min.js"></script>-->
     <script src="~/Scripts/Utility.js"></script>
     <link href="~/Content/Toastr/toastr.css" rel="stylesheet" />
     <script src="~/Content/Toastr/toastr.js"></script>
 
     @RenderSection("Script", false)
 </body>
-</html>
-<script>
-    var lock = false;
-    function Login() {
-        if (!lock) {
-            lock = true;
-            LoginControl();
-        }
-
-    }
-    function LoginControl() {
-        var model = { kullaniciAdi: $("#loginKullaniciAdi").val(), sifre: $("#loginSifre").val() };
-        if (model.kullaniciAdi.trim() != "" && model.sifre.trim()) {
-            $.ajax({
-                url: "http://192.168.1.42:5555/api/auth/login",
-                type: "POST",
-                data: JSON.stringify(model),
-                contentType: "application/json",
-                dataType: "JSON",
-                success: function (e) {
-                    $.ajax({
-                        url: "/home/loginol",
-                        type: "post",
-                        data: JSON.stringify(e),
-                        contentType: "application/json",
-                        dataType: "json",
-                        success: function (result) {
-                            ShowMessage("success", "Giriş Başarılı", "Başarıyla giriş yaptınız.");
-                            setTimeout(function myfunction() {
-                                location.reload();
-                            }, 1500);
-
-                        }
-
-                    })
-                },
-                error: function (jqXHR, error, errorThrown) {
-                    lock = false;
-                    if (jqXHR.status && jqXHR.status == 400)
-                        ShowMessage("info", "", jqXHR.responseText);
-                    else
-                        ShowMessage("error", "", "Beklenmeyen giriş hatası lütfen site yöneticisiyle iletişime geçin.");
-                }
-            });
-        } else {
-            lock = false;
-            ShowMessage("warning", "Boş Geçilemez", "Lütfen Kullanıcı Adı ve Şifre giriniz.");
-        }
-
-
-    }
-    function LogOut() {
-        $.ajax({
-            url: "/home/logout",
-            type: "post",
-            success: function (result) {
+    </html>
+    <script>
+        var lock = false;
+        function Login() {
+            if (!lock) {
+                lock = true;
+                LoginControl();
             }
 
-        });
-    }
-</script>
+        }
+        function LoginControl() {
+            var model = { kullaniciAdi: $("#loginKullaniciAdi").val(), sifre: $("#loginSifre").val() };
+            if (model.kullaniciAdi.trim() != "" && model.sifre.trim()) {
+                $.ajax({
+                    url: "http://192.168.1.42:5555/api/auth/login",
+                    type: "POST",
+                    data: JSON.stringify(model),
+                    contentType: "application/json",
+                    dataType: "JSON",
+                    success: function (e) {
+                        $.ajax({
+                            url: "/home/loginol",
+                            type: "post",
+                            data: JSON.stringify(e),
+                            contentType: "application/json",
+                            dataType: "json",
+                            success: function (result) {
+                                ShowMessage("success", "Giriş Başarılı", "Başarıyla giriş yaptınız.");
+                                setTimeout(function myfunction() {
+                                    location.reload();
+                                }, 1500);
+
+                            }
+
+                        })
+                    },
+                    error: function (jqXHR, error, errorThrown) {
+                        lock = false;
+                        if (jqXHR.status && jqXHR.status == 400)
+                            ShowMessage("info", "", jqXHR.responseText);
+                        else
+                            ShowMessage("error", "", "Beklenmeyen giriş hatası lütfen site yöneticisiyle iletişime geçin.");
+                    }
+                });
+            } else {
+                lock = false;
+                ShowMessage("warning", "Boş Geçilemez", "Lütfen Kullanıcı Adı ve Şifre giriniz.");
+            }
+
+
+        }
+        function LogOut() {
+            $.ajax({
+                url: "/home/logout",
+                type: "post",
+                success: function (result) {
+                }
+
+            });
+        }
+    </script>
